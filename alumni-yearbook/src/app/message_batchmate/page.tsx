@@ -19,7 +19,6 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Toaster } from "@/components/ui/sonner"
 import { Send, Search, UserCircle2, AlertCircle, ArrowLeft } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -87,7 +86,7 @@ export default function MessageBatchmate() {
   useEffect(() => {
     const fetchMessagesAndCheckStatus = async () => {
       if (!selectedUser || !session) return;
-    
+
       try {
         const response = await fetch('/api/messages/check', {
           method: 'POST',
@@ -99,7 +98,7 @@ export default function MessageBatchmate() {
             receiver: selectedUser.email
           })
         });
-    
+
         if (response.ok) {
           const data = await response.json();
           setMessages(data.messages);
@@ -126,54 +125,52 @@ export default function MessageBatchmate() {
     setFilteredUsers(filtered);
   };
 
-
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  
-  if (!message || !selectedUser || !session?.user?.email) {
-    toast.error("Please select a user and type a message");
-    return;
-  }
-  
-  if (!canMessage) {
-    toast.error("You can only send one message to this user");
-    return;
-  }
-  
-  setIsSubmitting(true);
-  
-  try {
-    const response = await fetch('/api/messageb', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        email_sender: session.user.email,
-        email_receiver: selectedUser.email, 
-        message 
-      }),
-    });
-  
-    if (response.ok) {
-      const newMessage = await response.json();
-      
-      setMessages(prevMessages => [...prevMessages, newMessage]);
-
-      setCanMessage(false);
-      
-      toast.success("Message sent successfully");
-      setMessage('');
-    } else {
-      toast.error("Failed to send message");
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!message || !selectedUser || !session?.user?.email) {
+      toast.error("Please select a user and type a message");
+      return;
     }
-  } catch (error) {
-    console.error("Error sending message:", error);
-    toast.error("Failed to send message");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+    
+    if (!canMessage) {
+      toast.error("You can only send one message to this user");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch('/api/messageb', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          email_sender: session.user.email,
+          email_receiver: selectedUser.email, 
+          message 
+        }),
+      });
+    
+      if (response.ok) {
+        const newMessage = await response.json();
+        
+        setMessages([newMessage]);
+        setCanMessage(false);
+        
+        toast.success("Message sent successfully");
+        setMessage('');
+      } else {
+        toast.error("Failed to send message");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("Failed to send message");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
@@ -204,18 +201,18 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   if (isMobileView) {
     return (
       <SidebarProvider>
-        <div className="flex flex-col h-screen w-full">
-          <header className="flex items-center justify-between p-4 bg-white shadow-sm w-full">
-            <div className="flex items-center w-full">
+        <div className="flex flex-col h-screen">
+          <header className="flex items-center justify-between p-4 bg-white shadow-sm">
+            <div className="flex items-center">
               <SidebarTrigger className="mr-3" />
               <h1 className="text-xl font-semibold">Message Batchmates</h1>
             </div>
           </header>
 
           {showUserList ? (
-            <div className="flex-grow overflow-y-auto w-full">
-              <div className="p-4 w-full">
-                <div className="relative w-full">
+            <div className="flex-grow overflow-y-auto">
+              <div className="p-4">
+                <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                   <Input 
                     placeholder="Search users..." 
@@ -226,25 +223,25 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                 </div>
               </div>
 
-              <div className="p-4 space-y-2 w-full">
+              <div className="p-4 space-y-2">
                 {filteredUsers.map(user => (
                   <div 
                     key={user.email} 
-                    className="flex items-center p-3 bg-gray-50 rounded-lg shadow-sm w-full"
+                    className="flex items-center p-3 bg-gray-50 rounded-lg shadow-sm"
                     onClick={() => handleUserSelect(user)}
                   >
-                    <UserCircle2 className="mr-3 text-gray-500 flex-shrink-0" size={40} />
-                    <div className="overflow-hidden">
-                      <div className="font-semibold truncate">{user.name}</div>
-                      <div className="text-sm text-gray-500 truncate">{user.email}</div>
+                    <UserCircle2 className="mr-3 text-gray-500" size={40} />
+                    <div>
+                      <div className="font-semibold">{user.name}</div>
+                      <div className="text-sm text-gray-500">{user.email}</div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           ) : (
-            <div className="flex flex-col h-full w-full">
-              <header className="flex items-center p-4 bg-white shadow-sm w-full">
+            <div className="flex flex-col h-full">
+              <header className="flex items-center p-4 bg-white shadow-sm">
                 <Button 
                   variant="ghost" 
                   size="icon" 
@@ -254,67 +251,67 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
                   <ArrowLeft size={24} />
                 </Button>
                 <UserCircle2 className="mr-3 text-gray-500" size={40} />
-                <div className="overflow-hidden">
-                  <div className="font-semibold truncate">{selectedUser?.name}</div>
-                  <div className="text-sm text-gray-500 truncate">{selectedUser?.email}</div>
+                <div>
+                  <div className="font-semibold">{selectedUser?.name}</div>
+                  <div className="text-sm text-gray-500">{selectedUser?.email}</div>
                 </div>
               </header>
 
-              <div className="p-4 w-full">
-                <Alert className="w-full">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    You can message a person once. This message will appear in their personalised yearbook.
-                  </AlertDescription>
-                </Alert>
-              </div>
-
-              <div className="flex-grow overflow-y-auto p-4 space-y-2 w-full">
-                {messages.map((msg, index) => (
-                  <div 
-                    key={index} 
-                    className={`flex ${msg.email_sender === session.user?.email ? 'justify-end' : 'justify-start'} w-full`}
-                  >
-                    <div 
-                      className={`max-w-[70%] p-2 rounded-lg ${
-                        msg.email_sender === session.user?.email 
-                          ? 'bg-blue-500 text-white' 
-                          : 'bg-gray-200 text-black'
-                      }`}
-                    >
-                      {msg.message}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <form onSubmit={handleSubmit} className="p-4 border-t bg-white w-full">
-                <div className="flex items-center w-full">
-                  <Input
-                    placeholder="Type a message"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    className="flex-grow mr-2"
-                    disabled={!canMessage}
-                  />
-                  <Button 
-                    type="submit" 
-                    disabled={isSubmitting || !message || !canMessage}
-                    className="flex items-center justify-center"
-                  >
-                    <Send size={20} />
-                  </Button>
-                </div>
-                {!canMessage && (
-                  <p className="text-sm text-red-500 mt-2">
-                    You have already sent a message to this user
-                  </p>
-                )}
-              </form>
+            <div className="p-4">
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  You can message a person once. This message will appear in their personalised yearbook.
+                </AlertDescription>
+              </Alert>
             </div>
-          )}
-        </div>
-        <AppSidebar />
+
+            <div className="flex-grow overflow-y-auto p-4 space-y-2">
+              {messages.map((msg, index) => (
+                <div 
+                  key={index} 
+                  className={`flex ${msg.email_sender === session.user?.email ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div 
+                    className={`max-w-[70%] p-2 rounded-lg ${
+                      msg.email_sender === session.user?.email 
+                        ? 'bg-blue-500 text-white' 
+                        : 'bg-gray-200 text-black'
+                    }`}
+                  >
+                    {msg.message}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-4 border-t bg-white">
+              <div className="flex items-center">
+                <Input
+                  placeholder="Type a message"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="flex-grow mr-2"
+                  disabled={!canMessage}
+                />
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting || !message || !canMessage}
+                  className="flex items-center justify-center"
+                >
+                  <Send size={20} />
+                </Button>
+              </div>
+              {!canMessage && (
+                <p className="text-sm text-red-500 mt-2">
+                  You have already sent a message to this user
+                </p>
+              )}
+            </form>
+          </div>
+        )}
+      </div>
+      <AppSidebar />
       </SidebarProvider>
     );
   }
@@ -437,7 +434,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
           </div>
         </div>
       </SidebarInset>
-      <Toaster />
     </SidebarProvider>
   );
 }
+

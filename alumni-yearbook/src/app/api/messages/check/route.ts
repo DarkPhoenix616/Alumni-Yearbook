@@ -16,23 +16,18 @@ export async function POST(request: Request) {
 
     const { sender, receiver } = await request.json();
 
-    const allMessages = await MessageBatchmate.find({
+    const messages = await MessageBatchmate.find({
       $or: [
         { email_sender: sender, email_receiver: receiver },
         { email_sender: receiver, email_receiver: sender }
       ]
     }).sort({ timestamp: 1 });
 
-    const hasSentMessage = await MessageBatchmate.findOne({
-      email_sender: sender,
-      email_receiver: receiver
-    });
-
-    const canMessage = !hasSentMessage;
+    const canMessage = messages.length === 0;
 
     return NextResponse.json({ 
-      messages: allMessages,
-      canMessage: canMessage
+      messages, 
+      canMessage 
     });
   } catch (error) {
     console.error('Error checking messages:', error);
