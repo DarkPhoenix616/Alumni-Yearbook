@@ -1,6 +1,6 @@
 import { title } from 'process';
-import {mongoose} from 'mongoose'
-//const mongoose = require('mongoose');
+
+const mongoose = require('mongoose');
 
 const SectionSchema = new mongoose.Schema({
     email: { type: String, required: true },
