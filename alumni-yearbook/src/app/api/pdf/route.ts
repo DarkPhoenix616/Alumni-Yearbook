@@ -370,6 +370,7 @@ export async function POST(request: Request) {
             try {
                 await cloudinary.uploader.destroy(section.cloudinaryId, { resource_type: "raw" });
             } catch (error) {
+                console.log(error);
                 return NextResponse.json(
                     { message: 'Error deleting sections' },
                     { status: 500 }
@@ -379,9 +380,10 @@ export async function POST(request: Request) {
 
         // Delete old sections from DB
         await Section.deleteMany({ email: userEmail });
-
+        console.log("something");
         // Generate and upload PDFs
         for (const [headtitle, lists] of Object.entries(groupedData)) {
+            console.log("testing");
             await generateSection(
                 "assets/base_bg.pdf",
                 `${headtitle}.pdf`,
